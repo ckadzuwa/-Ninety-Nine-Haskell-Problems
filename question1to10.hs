@@ -99,8 +99,8 @@ prop_isPalindrome :: Eq a => NonEmptyList a -> Bool
 prop_isPalindrome (NonEmpty xs) = isPalindrome (evenLengthPalindrome xs) && isPalindrome (oddLengthPalindrome xs) &&
     (not (firstHalf xs == reverse (secondHalf xs)) == not (isPalindrome xs))
     where 
-        evenLengthPalindrome xs = xs ++ reverse xs                          -- For list of length k creates a new list of size 2k
-        oddLengthPalindrome xs = xs ++ (head xs:[]) ++ reverse xs           -- For list of length k creates a new list of size 2k + 1
+        evenLengthPalindrome xs = xs ++ reverse xs                          -- For list xs of length k creates a new list of size 2k
+        oddLengthPalindrome xs = xs ++ (head xs:[]) ++ reverse xs           -- For list xs of length k creates a new list of size 2k + 1
         firstHalf xs = take ((quot (length xs) 2) + (rem (length xs) 2)) xs -- e.g. for [1,2,1] and [1,2] returns [1,2] and [1] respectively
         secondHalf xs = drop (quot (length xs) 2) xs                        -- e.g. for [1,2,1] and [1,2] returns [2,1] and [2] respectively
           
