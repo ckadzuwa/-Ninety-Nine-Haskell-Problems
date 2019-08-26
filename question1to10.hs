@@ -1,7 +1,6 @@
 -- See https://wiki.haskell.org/Template_Haskell
 {-# LANGUAGE TemplateHaskell #-}
 
-
 import Test.QuickCheck
 
 --------------------------------------------------------------------------
@@ -85,6 +84,28 @@ testMyReverse = myReverse "A man, a plan, a canal, panama!" == "!amanap ,lanac a
 prop_myReverse :: Eq a => [a] -> Bool
 prop_myReverse xs = (myReverse (myReverse xs)) == xs && myReverse xs == reverse xs  
 
--- Setup ability to run See http://hackage.haskell.org/package/QuickCheck-2.13.2/docs/Test-QuickCheck-All.html
+--------------------------------------------------------------------------
+-- Question 6
+--------------------------------------------------------------------------
+isPalindrome :: Eq a => [a] -> Bool
+isPalindrome [] = False
+isPalindrome xs = xs == (reverse xs)
+
+-- Test solution on conrete examples
+testIsPalindrome = isPalindrome [1,2,3] == False && isPalindrome "madamimadam" == True && isPalindrome [1,2,4,8,16,8,4,2,1]
+
+-- Prove solution: Should reliably detect even, odd length and non palindromes
+prop_isPalindrome :: Eq a => NonEmptyList a -> Bool
+prop_isPalindrome (NonEmpty xs) = isPalindrome (evenLengthPalindrome xs) && isPalindrome (oddLengthPalindrome xs) &&
+    (not (firstHalf xs == reverse (secondHalf xs)) == not (isPalindrome xs))
+    where 
+        evenLengthPalindrome xs = xs ++ reverse xs                          -- For list of length k creates a new list of size 2k
+        oddLengthPalindrome xs = xs ++ (head xs:[]) ++ reverse xs           -- For list of length k creates a new list of size 2k + 1
+        firstHalf xs = take ((quot (length xs) 2) + (rem (length xs) 2)) xs -- e.g. for [1,2,1] and [1,2] returns [1,2] and [1] respectively
+        secondHalf xs = drop (quot (length xs) 2) xs                        -- e.g. for [1,2,1] and [1,2] returns [2,1] and [2] respectively
+          
+
+-- Add ability to run quickCheck props 
+-- See http://hackage.haskell.org/package/QuickCheck-2.13.2/docs/Test-QuickCheck-All.html
 return []
 runTests = $quickCheckAll
