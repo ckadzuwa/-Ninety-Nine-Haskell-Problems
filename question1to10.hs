@@ -17,7 +17,7 @@ testMyLast = myLast [1,2,3,4] == 4 && myLast  ['x', 'y', 'z'] == 'z'
 
 -- Prove solution: Last element in non-empty list must equal first element in reversed list
 prop_myLast :: Eq a => NonEmptyList a -> Bool
-prop_myLast (NonEmpty xs) = myLast (xs) == head (reverse xs)  
+prop_myLast (NonEmpty xs) = myLast xs == (head.reverse) xs  
 
 --------------------------------------------------------------------------
 -- Question 2
@@ -30,9 +30,9 @@ myButLast (_:xs) = myButLast xs
 -- Test solution on concrete examples
 testMyButLast = myButLast [1,2,3,4] == 3 && myButLast ['a'..'z'] == 'y'
 
--- Prove solution: Second last element on a (miinum 2) element list must equal the element indexed at list's second last position
+-- Prove solution: Second last element on a list (of minimum of size 2) must equal the element indexed at list's second last position
 prop_myButLast :: Eq a => NonEmptyList a -> Property
-prop_myButLast (NonEmpty xs) = (length xs > 1) ==> (myButLast xs ==  xs !! (length xs - 2))
+prop_myButLast (NonEmpty xs) = (length xs > 1) ==> myButLast xs ==  xs !! (length xs - 2)
 
 --------------------------------------------------------------------------
 -- Question 3
@@ -51,7 +51,7 @@ testElementAt = elementAt [1,2,3] 2 == 2 && elementAt "haskell" 5 == 'e'
 -- Prove solution: For k > 1 and no larger than the size of the list the kth 
 -- element is equivalent to last element after collecting the first k elements
 prop_elementAt :: Eq a => NonEmptyList a -> Int -> Property
-prop_elementAt (NonEmpty xs) k = (k > 1 && k <= length xs) ==> ((elementAt xs k) == (last (take k xs)))
+prop_elementAt (NonEmpty xs) k = k > 1 && k <= length xs ==> elementAt xs k == (last $ take k xs)
 
 --------------------------------------------------------------------------
 -- Question 4
@@ -67,14 +67,14 @@ testMyLength = myLength [123, 456, 789] == 3 && myLength "Hello, world!" == 13
 -- Prove solution: Dropping myLength elements from list should yield empty list (other list is bigger than myLenght)
 -- and custom defined length should be equivalent to built in length function
 prop_myLength :: Eq a => [a] -> Bool 
-prop_myLength xs = (drop (myLength xs) xs) == [] && myLength xs == length xs
+prop_myLength xs = drop (myLength xs) xs == [] && myLength xs == length xs
 
 --------------------------------------------------------------------------
 -- Question 5
 --------------------------------------------------------------------------
 myReverse :: [a] -> [a] 
 myReverse [] = []
-myReverse (x:xs) = (myReverse xs) ++ [x]
+myReverse (x:xs) = myReverse xs ++ [x]
 
 -- Test solution on concrete examples
 testMyReverse = myReverse "A man, a plan, a canal, panama!" == "!amanap ,lanac a ,nalp a ,nam A" && myReverse [1..4] == [1,2,3,4]
@@ -82,7 +82,7 @@ testMyReverse = myReverse "A man, a plan, a canal, panama!" == "!amanap ,lanac a
 -- Prove solution: Reversing a reversed list should yield the original list and
 -- custom reverse should be equivalent to built in reverse function
 prop_myReverse :: Eq a => [a] -> Bool
-prop_myReverse xs = (myReverse (myReverse xs)) == xs && myReverse xs == reverse xs  
+prop_myReverse xs = (myReverse.myReverse) xs == xs && myReverse xs == reverse xs  
 
 --------------------------------------------------------------------------
 -- Question 6
@@ -96,7 +96,7 @@ testIsPalindrome = isPalindrome [1,2,3] == False && isPalindrome "madamimadam" =
 
 -- Prove solution: Should reliably detect even, odd length and non palindromes
 prop_isPalindrome :: Eq a => NonEmptyList a -> Bool
-prop_isPalindrome (NonEmpty xs) = isPalindrome (evenLengthPalindrome xs) && isPalindrome (oddLengthPalindrome xs) &&
+prop_isPalindrome (NonEmpty xs) = (isPalindrome.evenLengthPalindrome) xs && (isPalindrome.oddLengthPalindrome) xs &&
     (not (firstHalf xs == reverse (secondHalf xs)) == not (isPalindrome xs))
     where 
         evenLengthPalindrome xs = xs ++ reverse xs                          -- For list xs of length k creates a new list of size 2k
