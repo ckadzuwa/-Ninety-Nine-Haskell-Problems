@@ -103,7 +103,20 @@ prop_isPalindrome (NonEmpty xs) = (isPalindrome.evenLengthPalindrome) xs && (isP
         oddLengthPalindrome xs = xs ++ (head xs:[]) ++ reverse xs           -- For list xs of length k creates a new list of size 2k + 1
         firstHalf xs = take ((quot (length xs) 2) + (rem (length xs) 2)) xs -- e.g. for [1,2,1] and [1,2] returns [1,2] and [1] respectively
         secondHalf xs = drop (quot (length xs) 2) xs                        -- e.g. for [1,2,1] and [1,2] returns [2,1] and [2] respectively
-          
+
+--------------------------------------------------------------------------
+-- Question 7
+--------------------------------------------------------------------------        
+data NestedList a = Elem a | List [NestedList a]  
+
+flatten :: NestedList a -> [a] 
+flatten (Elem a) = [a]
+flatten (List []) = []
+flatten (List (x:xs)) = flatten x ++ flatten (List xs)
+
+-- Test solution on concrete examples
+-- testFlatten =   (flatten (List [])) == [] && (flatten (List [Elem 1, List [Elem 2, List [Elem 3, Elem 4], Elem 5]]) == [1,2,3,4,5]
+
 
 -- Add ability to run quickCheck props 
 -- See http://hackage.haskell.org/package/QuickCheck-2.13.2/docs/Test-QuickCheck-All.html
