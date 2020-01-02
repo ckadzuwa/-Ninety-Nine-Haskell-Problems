@@ -1,7 +1,3 @@
--- Type ghci
--- :l question1to10.hs
--- Invoke functions via name and arguements
-
 -- See https://wiki.haskell.org/Template_Haskell
 {-# LANGUAGE TemplateHaskell #-}
 
