@@ -1,3 +1,7 @@
+-- Type ghci
+-- :l question1to10.hs
+-- Invoke functions via name and arguements
+
 -- See https://wiki.haskell.org/Template_Haskell
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -64,7 +68,7 @@ myLength (x:xs) = 1 + myLength xs
 -- Test solution on concrete examples
 testMyLength = myLength [123, 456, 789] == 3 && myLength "Hello, world!" == 13
 
--- Prove solution: Dropping myLength elements from list should yield empty list (other list is bigger than myLenght)
+-- Prove solution: Dropping myLength elements from list should yield empty list (otherwise list is bigger than myLenghth)
 -- and custom defined length should be equivalent to built in length function
 prop_myLength :: Eq a => [a] -> Bool 
 prop_myLength xs = drop (myLength xs) xs == [] && myLength xs == length xs
@@ -115,8 +119,21 @@ flatten (List []) = []
 flatten (List (x:xs)) = flatten x ++ flatten (List xs)
 
 -- Test solution on concrete examples
--- testFlatten =   (flatten (List [])) == [] && (flatten (List [Elem 1, List [Elem 2, List [Elem 3, Elem 4], Elem 5]]) == [1,2,3,4,5]
+testFlatten = flatten (List [Elem 1]) == [1] && flatten (Elem 5) == [5] && flatten (List [Elem 1, List [Elem 2, List [Elem 3, Elem 4], Elem 5]]) == [1,2,3,4,5]
 
+--------------------------------------------------------------------------
+-- Question 8
+--------------------------------------------------------------------------  
+compress :: Eq a => [a] -> [a]
+compress xs = compressHelper xs []
+ 
+-- Define a helper function that accumulates the result
+compressHelper :: Eq a => [a] -> [a] -> [a] 
+compressHelper [] acc = acc
+compressHelper [x] acc = acc ++ [x]
+compressHelper (x:y:xs) acc
+    | x == y = compressHelper (y:xs) acc 
+    | x /= y = compressHelper (y:xs) (acc ++ [x])  
 
 -- Add ability to run quickCheck props 
 -- See http://hackage.haskell.org/package/QuickCheck-2.13.2/docs/Test-QuickCheck-All.html
