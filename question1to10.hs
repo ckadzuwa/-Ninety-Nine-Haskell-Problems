@@ -2,6 +2,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 import Test.QuickCheck
+import Data.List (group)
 
 --------------------------------------------------------------------------
 -- Question 1
@@ -122,14 +123,43 @@ testFlatten = flatten (List [Elem 1]) == [1] && flatten (Elem 5) == [5] && flatt
 --------------------------------------------------------------------------  
 compress :: Eq a => [a] -> [a]
 compress xs = compressHelper xs []
- 
--- Define a helper function that accumulates the result
-compressHelper :: Eq a => [a] -> [a] -> [a] 
-compressHelper [] acc = acc
-compressHelper [x] acc = acc ++ [x]
-compressHelper (x:y:xs) acc
-    | x == y = compressHelper (y:xs) acc 
-    | x /= y = compressHelper (y:xs) (acc ++ [x])  
+    where compressHelper [] acc = acc
+          compressHelper [x] acc = acc ++ [x]
+          compressHelper (x:y:xs) acc
+            | x == y = compressHelper (y:xs) acc 
+            | x /= y = compressHelper (y:xs) (acc ++ [x])  
+
+-- Test solution on concrete examples
+testCompress = compress "aaaabccaadeeee" == "abcade" && compress [1,1,2,1,1,3,3,3] == [1,2,1,3]  
+
+--------------------------------------------------------------------------
+-- Question 9
+--------------------------------------------------------------------------   
+pack :: Eq a => [a] -> [[a]]
+pack [] = []
+pack (x:xs) = packHelper xs [[x]]
+    where packHelper [] acc = acc
+          packHelper (x:xs) acc 
+            | x == ((last.last) acc) = packHelper xs (init acc ++ [(last acc) ++ [x]])
+            | x /= ((last.last) acc) = packHelper xs (acc ++ [[x]])
+
+-- Test solution on concrete examples
+test_pack = pack [1] == [[1]] && pack [1,2,2] == [[1],[2,2]] && pack ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a','a', 'd', 'e', 'e', 'e', 'e'] == ["aaaa","b","cc","aa","d","eeee"]
+
+-- Prove solution: Packing a list should the same as running group
+prop_pack :: Eq a => [a] -> Bool
+prop_pack xs = pack xs == group xs  
+
+--------------------------------------------------------------------------
+-- Question 10
+-------------------------------------------------------------------------- 
+encode :: Eq a => [a] -> [(Int,a)]
+encode [] = []
+encode xs = [(length x, head x) |x <- (pack xs)]
+
+test_encode = encode "aaaabccaadeeee" == [(4,'a'),(1,'b'),(2,'c'),(2,'a'),(1,'d'),(4,'e')]
+
+
 
 -- Add ability to run quickCheck props 
 -- See http://hackage.haskell.org/package/QuickCheck-2.13.2/docs/Test-QuickCheck-All.html
