@@ -159,6 +159,17 @@ encode xs = [(length x, head x) |x <- (pack xs)]
 
 test_encode = encode "aaaabccaadeeee" == [(4,'a'),(1,'b'),(2,'c'),(2,'a'),(1,'d'),(4,'e')]
 
+--------------------------------------------------------------------------
+-- Question 11
+-------------------------------------------------------------------------- 
+data Entry a = Single a | Multiple Int a deriving (Show)    
+
+encodeModified :: Eq a => [a] -> [Entry a] 
+encodeModified [] = []
+encodeModified xs = [if (length x == 1) then Single (head x) else Multiple (length x) (head x) |x <- (pack xs)] 
+
+test_encodeModified = encodeModified "aaaabccaadeeee" == [Multiple 4 'a',Single 'b',Multiple 2 'c',
+ Multiple 2 'a',Single 'd',Multiple 4 'e']
 
 
 -- Add ability to run quickCheck props 
